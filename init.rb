@@ -6,3 +6,6 @@ Redmine::Plugin.register :time_entries_report do
   url 'https://github.com/crazyproger/time_entries_report'
   author_url 'https://github.com/crazyproger'
 end
+
+require 'timelog_controller_patch'
+TimelogController.send(:include, TimelogControllerPatch)
