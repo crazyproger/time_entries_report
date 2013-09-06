@@ -1,3 +1,5 @@
+require 'redmine'
+
 Redmine::Plugin.register :time_entries_report do
   name 'Time Entries Report plugin'
   author 'crazyproger'
@@ -9,3 +11,8 @@ end
 
 require 'timelog_controller_patch'
 TimelogController.send(:include, TimelogControllerPatch)
+
+RedmineApp::Application.routes.prepend do
+  get '/time_entries/detailed', to: 'timelog#detailed'
+end
+
