@@ -13,6 +13,7 @@ require 'timelog_controller_patch'
 TimelogController.send(:include, TimelogControllerPatch)
 
 RedmineApp::Application.routes.prepend do
+  get '/projects/:id/time_entries/detailed', to: 'timelog#detailed', as: 'with_project'
   get '/time_entries/detailed', to: 'timelog#detailed'
 end
 
