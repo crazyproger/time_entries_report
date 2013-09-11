@@ -36,7 +36,7 @@
               <%= link_to(l(:label_detailed), with_project_path(@project), :class => (action_name == 'detailed' ? 'selected' : nil)) %>
 
           <% else %>
-              <%= link_to(l(:label_detailed), query_params.merge({:controller => 'timelog', :action => 'detailed', :project_id => @project}),
+              <%= link_to(l(:label_detailed), query_params.merge({:controller => 'detailed_query', :action => 'detailed', :project_id => @project}),
                           :class => (action_name == 'detailed' ? 'selected' : nil)) %>
           <% end %>
         </li>
