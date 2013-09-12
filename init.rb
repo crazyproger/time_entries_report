@@ -1,3 +1,6 @@
+require 'issue_patch'
+Issue.send(:include, IssuePatch)
+
 require 'redmine'
 
 Redmine::Plugin.register :time_entries_report do
@@ -13,4 +16,3 @@ RedmineApp::Application.routes.prepend do
   get '/projects/:project_id/time_entries/detailed', to: 'detailed_query#detailed', as: 'with_project'
   get '/time_entries/detailed', to: 'detailed_query#detailed'
 end
-

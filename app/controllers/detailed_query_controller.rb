@@ -16,7 +16,7 @@ class DetailedQueryController < ApplicationController
 
   def detailed
     @total_hours=1
-    @query = IssueQuery.new(:name => "_")
+    @query = IssueByTimeEntryQuery.new(:name => "_")
     @query.project = @project
     @query.build_from_params(params)
     session[:query] = {:project_id => @query.project_id, :filters => @query.filters, :group_by => @query.group_by, :column_names => @query.column_names}
@@ -37,14 +37,14 @@ class DetailedQueryController < ApplicationController
           @limit = per_page_option
       end
 
-      @issue_count = @query.issue_count
+      @issue_count = @query.entry_count
       @issue_pages = Paginator.new @issue_count, @limit, params['page']
       @offset ||= @issue_pages.offset
-      @issues = @query.issues(:include => [:assigned_to, :tracker, :priority, :category, :fixed_version],
+      @issues = @query.entries(:include => [:assigned_to, :tracker, :priority, :category, :fixed_version],
                               :order => sort_clause,
                               :offset => @offset,
                               :limit => @limit)
-      @issue_count_by_group = @query.issue_count_by_group
+      @issue_count_by_group = @query.entry_count_by_group
 
       respond_to do |format|
         format.html { render :layout => !request.xhr? }
