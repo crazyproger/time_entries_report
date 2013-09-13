@@ -1,3 +1,7 @@
 # English strings go here for Rails i18n
 en:
+  label_detailed: "By tasks"
+  label_spent_hours_filtered: "Spent(with filters)"
+  field_time_spent_on: "Date spent"
+  field_time_spent_user: "Spent user"
   # my_label: "My label"

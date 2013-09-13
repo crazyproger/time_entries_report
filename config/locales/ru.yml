@@ -1,0 +1,5 @@
+ru:
+  label_detailed: "По задачам"
+  label_spent_hours_filtered: "Списано(с учетом фильтров)"
+  field_time_spent_on: "Дата списания времени"
+  field_time_spent_user: "Пользователь списывавший время"
