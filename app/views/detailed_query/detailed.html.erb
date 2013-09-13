@@ -52,3 +52,11 @@
       <% end %>
     </div>
 <% end %>
+
+<!--this 2 filters is mandatory - disabling checkboxes-->
+<%= javascript_tag do %>
+    $(document).ready(function(){
+        $("#cb_time_spent_on").hide()
+        $("#cb_time_spent_user_id").hide();
+    })
+<% end %>
