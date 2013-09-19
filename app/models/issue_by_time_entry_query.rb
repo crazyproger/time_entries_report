@@ -89,21 +89,25 @@ class IssueByTimeEntryQuery < IssueQuery
     end
   end
 
+  def entries_scope(options={})
+    order_option = [group_by_sort_order, options[:order]].flatten.reject(&:blank?)
+    Issue.visible.where(statement).
+        includes(:status, :project, :time_entries).
+        where(options[:conditions]).
+        includes(options[:include] || []).
+        joins(query_joins(order_option.join(',')))
+  end
+
 
     # Returns the issues
   # Valid options are :order, :offset, :limit, :include, :conditions
   def entries(options={})
     order_option = [group_by_sort_order, options[:order]].flatten.reject(&:blank?)
 
-    issues = Issue.visible.where(options[:conditions]).all(
-        :include => ([:status, :project, :time_entries] + (options[:include] || [])).uniq,
-        :conditions => statement,
-        :order => order_option,
-        :joins => query_joins(order_option.join(',')),
-        :limit => options[:limit],
-        :offset => options[:offset]
-    #:group => "#{Issue.table_name}.id"
-    )
+    issues = entries_scope.
+        order(order_option).
+        limit(options[:limit]).
+        offset(options[:offset])
 
     if has_column?(:spent_hours)
       Issue.load_visible_spent_hours(issues)
@@ -152,7 +156,6 @@ class IssueByTimeEntryQuery < IssueQuery
 
   def query_joins(order_option)
     joins = []
-    #joins = [:time_entries]
     for_order = joins_for_order_statement(order_option)
     joins << for_order unless for_order.nil?
     joins
