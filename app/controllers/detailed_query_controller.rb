@@ -10,6 +10,7 @@ class DetailedQueryController < ApplicationController
 
   helper :timelog
   helper :queries
+  include QueriesHelper
   helper :issues
   helper :sort
   include SortHelper
