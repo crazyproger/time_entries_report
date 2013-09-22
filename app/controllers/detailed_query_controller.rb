@@ -1,10 +1,10 @@
 class DetailedQueryController < ApplicationController
   unloadable
 
-  before_filter :authorize_global, :only => [:detailed]
-  before_filter :find_optional_project, :only => [:detailed]
-  accept_rss_auth :detailed
-  accept_api_auth :detailed
+  before_filter :authorize_global, :only => [:detailed, :detailed_time_log]
+  before_filter :find_optional_project, :only => [:detailed, :detailed_time_log]
+  accept_rss_auth :detailed, :detailed_time_log
+  accept_api_auth :detailed, :detailed_time_log
 
   rescue_from Query::StatementInvalid, :with => :query_statement_invalid
 
@@ -20,7 +20,6 @@ class DetailedQueryController < ApplicationController
     @query = IssueByTimeEntryQuery.new(:name => "_")
     @query.project = @project
     @query.build_from_params(params)
-    session[:query] = {:project_id => @query.project_id, :filters => @query.filters, :group_by => @query.group_by, :column_names => @query.column_names}
 
     sort_init(@query.sort_criteria.empty? ? [['id', 'desc']] : @query.sort_criteria)
     sort_update(@query.sortable_columns)
@@ -68,10 +67,55 @@ class DetailedQueryController < ApplicationController
     end
   end
 
+  def detailed_time_log
+    @query = TimeEntryExtendedQuery.build_from_params(params, :project => @project, :name => '_')
+
+    sort_init(@query.sort_criteria.empty? ? [['spent_on', 'desc']] : @query.sort_criteria)
+    sort_update(@query.sortable_columns)
+    scope = time_entry_scope(:order => sort_clause)
+
+    respond_to do |format|
+      format.html {
+        # Paginate results
+        @entry_count = scope.count
+        @entry_pages = Paginator.new @entry_count, per_page_option, params['page']
+        @entries = scope.all(
+            :include => [:project, :activity, :user, {:issue => :tracker}],
+            :limit  =>  @entry_pages.per_page,
+            :offset =>  @entry_pages.offset
+        )
+        @total_hours = scope.sum(:hours).to_f
+
+        render :layout => !request.xhr?
+      }
+      format.api  {
+        @entry_count = scope.count
+        @offset, @limit = api_offset_and_limit
+        @entries = scope.all(
+            :include => [:project, :activity, :user, {:issue => :tracker}],
+            :limit  => @limit,
+            :offset => @offset
+        )
+      }
+      format.csv {
+        # Export all entries
+        @entries = scope.all(
+            :include => [:project, :activity, :user, {:issue => [:tracker, :assigned_to, :priority]}]
+        )
+        send_data(query_to_csv(@entries, @query, params), :type => 'text/csv; header=present', :filename => 'timelog.csv')
+      }
+    end
+  end
+
   private
   def find_optional_project
     unless params[:project_id].blank?
       @project = Project.find(params[:project_id])
     end
+  end
+
+  # Returns the TimeEntry scope for index and report actions
+  def time_entry_scope(options={})
+    @query.results_scope(options)
   end
 end

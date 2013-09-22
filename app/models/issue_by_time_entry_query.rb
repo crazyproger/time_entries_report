@@ -178,5 +178,3 @@ class IssueByTimeEntryQuery < IssueQuery
     '('+sql_for_field(field, operator, value, TimeEntry.table_name, 'user_id')+')'
   end
 end
-
-#Issue.joins(:time_entries).where(time_entries: {created_on: Time.now.midnight..Time.now.midnight+1.day}).group("issues.id").select("issues.*, sum(time_entries.hours) as hours")

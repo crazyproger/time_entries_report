@@ -14,5 +14,7 @@ end
 
 RedmineApp::Application.routes.prepend do
   get '/projects/:project_id/time_entries/detailed', to: 'detailed_query#detailed', as: 'with_project'
+  get '/projects/:project_id/time_entries/detailed_time_log', to: 'detailed_query#detailed_time_log', as: 'detailed_with_project'
   get '/time_entries/detailed', to: 'detailed_query#detailed'
+  get '/time_entries/detailed_time_log', to: 'detailed_query#detailed_time_log'
 end

@@ -40,6 +40,15 @@
                           :class => (action_name == 'detailed' ? 'selected' : nil)) %>
           <% end %>
         </li>
+        <li>
+          <% if @project %>
+              <%= link_to(l(:label_detailed_time_log), detailed_with_project_path(@project), :class => (action_name == 'detailed_time_log' ? 'selected' : nil)) %>
+
+          <% else %>
+              <%= link_to(l(:label_detailed_time_log), query_params.merge({:controller => 'detailed_query', :action => 'detailed_time_log', :project_id => @project}),
+                          :class => (action_name == 'detailed_time_log' ? 'selected' : nil)) %>
+          <% end %>
+        </li>
     <% end %>
   </ul>
 </div>
