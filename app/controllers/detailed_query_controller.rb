@@ -72,34 +72,32 @@ class DetailedQueryController < ApplicationController
 
     sort_init(@query.sort_criteria.empty? ? [['spent_on', 'desc']] : @query.sort_criteria)
     sort_update(@query.sortable_columns)
-    scope = time_entry_scope(:order => sort_clause)
 
     respond_to do |format|
       format.html {
         # Paginate results
-        @entry_count = scope.count
+        @entry_count = @query.count(sort_clause)
         @entry_pages = Paginator.new @entry_count, per_page_option, params['page']
-        @entries = scope.all(
-            :include => [:project, :activity, :user, {:issue => :tracker}],
+        @entries = @query.entries(
             :limit  =>  @entry_pages.per_page,
-            :offset =>  @entry_pages.offset
+            :offset =>  @entry_pages.offset,
+            :order => sort_clause
         )
-        @total_hours = scope.sum(:hours).to_f
+        @total_hours = time_entry_scope(sort_clause).sum(:hours).to_f
 
         render :layout => !request.xhr?
       }
       format.api  {
-        @entry_count = scope.count
+        @entry_count = @query.count(sort_clause)
         @offset, @limit = api_offset_and_limit
-        @entries = scope.all(
-            :include => [:project, :activity, :user, {:issue => :tracker}],
+        @entries = @query.entries(
             :limit  => @limit,
             :offset => @offset
         )
       }
       format.csv {
         # Export all entries
-        @entries = scope.all(
+        @entries = @query.entries(
             :include => [:project, :activity, :user, {:issue => [:tracker, :assigned_to, :priority]}]
         )
         send_data(query_to_csv(@entries, @query, params), :type => 'text/csv; header=present', :filename => 'timelog.csv')
@@ -115,7 +113,7 @@ class DetailedQueryController < ApplicationController
   end
 
   # Returns the TimeEntry scope for index and report actions
-  def time_entry_scope(options={})
+  def time_entry_scope(options)
     @query.results_scope(options)
   end
 end
