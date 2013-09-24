@@ -32,6 +32,15 @@ class TimeEntryExtendedQuery < TimeEntryQuery
   end
 
 
+  def build_from_params(params)
+    super(params)
+    parameters = params[:f]
+    if parameters.nil? || (!parameters.include? 'spent_on')
+      add_filter('spent_on', 'lm')
+    end
+    self
+  end
+
   def available_columns
     return @available_columns if @available_columns
     @available_columns = self.class.available_columns.dup
