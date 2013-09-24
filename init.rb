@@ -1,5 +1,7 @@
 require 'issue_patch'
 Issue.send(:include, IssuePatch)
+require 'time_entry_patch'
+TimeEntry.send(:include, TimeEntryPatch)
 
 require 'redmine'
 
