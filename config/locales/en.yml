@@ -14,4 +14,4 @@ en:
   field_issue_due_date: "Due date"
   field_issue_estimated_hours: "Estimated hours"
   field_issue_subject: "Subject"
-  # my_label: "My label"
+  field_total_hours: "Total hours"

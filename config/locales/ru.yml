@@ -13,3 +13,4 @@ ru:
   field_issue_due_date: "Дата выполнения"
   field_issue_estimated_hours: "Оценка времени"
   field_issue_subject: "Тема"
+  field_total_hours: "Затрачено всего"

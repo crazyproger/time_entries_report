@@ -54,11 +54,12 @@ class TimeEntryExtendedQuery < TimeEntryQuery
     @available_columns << QueryColumn.new(:issue_fixed_version, :sortable => "#{Version.table_name}.name")
     @available_columns << QueryColumn.new(:issue_due_date, :sortable => "#{Issue.table_name}.due_date")
     @available_columns << QueryColumn.new(:issue_estimated_hours, :sortable => "#{Issue.table_name}.estimated_hours")
+    @available_columns << QueryColumn.new(:total_hours)
     @available_columns
   end
 
   def default_columns_names
-    @default_columns_names ||= [:project, :user, :issue, :hours]
+    @default_columns_names ||= [:project, :user, :issue, :hours, :total_hours]
   end
 
   def results_scope(sort_clause)
@@ -84,7 +85,10 @@ class TimeEntryExtendedQuery < TimeEntryQuery
     grouped = scope.group(:user_id, :issue_id)
     time_entries = grouped.clone.all(options)
     times = grouped.clone.sum(:hours)
+    ids = time_entries.map {|te| te.issue_id}    #todo make set from array
+    total_times = TimeEntry.group(:issue_id).where(issue_id:ids).sum(:hours)
     load_hours_to_entries(time_entries, times)
+    load_total_hours_to_entries(time_entries, total_times)
     time_entries
   end
 
@@ -92,6 +96,14 @@ class TimeEntryExtendedQuery < TimeEntryQuery
     if entries.any?
       entries.each do |entry|
         entry.hours=times[[entry.user_id, entry.issue_id]]
+      end
+    end
+  end
+
+  def load_total_hours_to_entries(entries, times)
+    if entries.any?
+      entries.each do |entry|
+        entry.total_hours=times[entry.issue_id]
       end
     end
   end

@@ -9,6 +9,15 @@ module TimeEntryPatch
   end
 
   module InstanceMethods
+
+    def total_hours
+      @total_hours ||= -1
+      end
+
+    def total_hours=(total)
+      @total_hours=total
+    end
+
     def issue_author
       self.issue.author.name
     end
