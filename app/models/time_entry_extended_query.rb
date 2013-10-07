@@ -5,6 +5,7 @@ class TimeEntryExtendedQuery < TimeEntryQuery
       QueryColumn.new(:user, :sortable => lambda {User.fields_for_order_statement}, :groupable => true),
       QueryColumn.new(:activity, :sortable => "#{TimeEntryActivity.table_name}.position", :groupable => true),
       QueryColumn.new(:issue, :sortable => "#{Issue.table_name}.id"),
+      QueryColumn.new(:issue_subject),
       QueryColumn.new(:hours, :sortable => "#{TimeEntry.table_name}.hours"),
   ]
 
@@ -59,7 +60,7 @@ class TimeEntryExtendedQuery < TimeEntryQuery
   end
 
   def default_columns_names
-    @default_columns_names ||= [:project, :user, :issue, :hours, :total_hours]
+    @default_columns_names ||= [:project, :user, :issue_subject, :hours, :total_hours]
   end
 
   def results_scope(sort_clause)
